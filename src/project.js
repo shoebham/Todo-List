@@ -10,9 +10,11 @@ export default class project
     {
         this.list_of_todo.push(todolist);
     }
-    deleteTodo(todolist)
+    removeItem(todolist)
     {
+        console.log("Before removing",this.list_of_todo);
         this.list_of_todo.splice(this.list_of_todo.indexOf(todolist),1);
+        console.log("After removing",this.list_of_todo);
     }
     getItem(todolist)
     {

@@ -3,6 +3,7 @@ import todo from "./todo";
 
 let list_of_projects = [];
 let list_of_tasks = [];
+let list_of_completed_tasks = [];
 function createTododiv()
 {
     let todo_div = document.createElement("div");
@@ -30,16 +31,22 @@ function createItem(item)
     let input = document.createElement("input");
     let label = document.createElement("label");
     let span  = document.createElement("span");
+
     input.type = "checkbox";
     li.style="list-style-type: none";
     span.textContent = item.getTitle();
+
+    input.addEventListener("change",()=>{
+        console.log("here");
+        span.classList.toggle("completed");
+    });
     label.appendChild(input);
     label.appendChild(span);
     li.appendChild(label);
     li.appendChild(deleteButton(li));
+    
     return li;
 }
-
 function setup()
 {
     console.log("in setup");

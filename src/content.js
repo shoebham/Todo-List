@@ -27,7 +27,15 @@ function createProject(Project)
 function createItem(item)
 {
     let li = document.createElement("li");
-    li.textContent = item.getTitle();
+    let input = document.createElement("input");
+    let label = document.createElement("label");
+    let span  = document.createElement("span");
+    input.type = "checkbox";
+    li.style="list-style-type: none";
+    span.textContent = item.getTitle();
+    label.appendChild(input);
+    label.appendChild(span);
+    li.appendChild(label);
     li.appendChild(deleteButton(li));
     return li;
 }

@@ -1,6 +1,5 @@
 export default class todo
-{
-    
+{    
     constructor(title,desc,due,prior)
     {
         this.title=title;

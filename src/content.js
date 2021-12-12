@@ -1,8 +1,8 @@
 import project from "./project";
 import todo from "./todo";
 
-let list_of_projects = [];
-let list_of_tasks = [];
+let list_of_projects = new Set();
+let list_of_tasks = new Set();
 let list_of_completed_tasks = [];
 function createTododiv()
 {
@@ -25,6 +25,7 @@ function createProject(Project)
     });
     return ul;
 }
+
 function createItem(item)
 {
     let li = document.createElement("li");
@@ -44,15 +45,56 @@ function createItem(item)
     label.appendChild(span);
     li.appendChild(label);
     li.appendChild(deleteButton(li));
-    
+    li.appendChild(editButton(li));
     return li;
+}
+function editButton(item)
+{
+    let button = document.createElement("button");
+    button.textContent = "✏️";
+    button.className = "edit";
+    button.addEventListener("click",()=>
+    {
+        console.log("Editing",item.childNodes[0].textContent);
+        let input = document.createElement("input");
+        input.type = "text";
+        input.value = item.childNodes[0].textContent;
+        item.replaceChild(input,item.childNodes[0]);
+        let doneButton = document.createElement("button");
+        doneButton.textContent = "✔️";  
+        doneButton.className = "done";
+        doneButton.addEventListener("click",()=>
+        {
+            let editedTask = input.value;
+            let checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            let label = document.createElement("label");
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(editedTask));
+            item.replaceChild(label,input);
+            item.replaceChild(button,doneButton);
+        });
+        item.replaceChild(doneButton,button);
+    });
+    return button;
+}
+
+function editTask(item)
+{
+    list_of_tasks.forEach((task)=>
+    {
+        if(task.getTitle()==item)
+        {
+            task.setTitle(item);
+        }
+    });
 }
 function setup()
 {
     console.log("in setup");
     let div = createTododiv();
     let p = new project("Project");
-    list_of_projects.push(p);
+    list_of_projects.add(p);
     let t = new todo("Todo",1,2,3);
     let t2 = new todo("Todo3",1,2,3);
     let test = createItem(new todo("Todo2",1,2,3));
@@ -69,18 +111,21 @@ function setup()
 
 function del(item)
 {
+    console.log("deleting",item.childNodes[0].textContent);
     item.remove();
+    console.log( "List of tasks after deleting", list_of_tasks);
 }
 function deleteFromProject(item)
 {
     
     let todoTitle = item.childNodes[0].textContent;
     let projectTitle = item.classList[1];
+    
     // console.log(item.childNodes[0]);
     // document.getElementsByClassName("projectItem")[0].childNodes[0].textContent
     list_of_projects.forEach((project)=>
     {
-        console.log("project title",project.getTitle(),todoTitle,projectTitle);
+        console.log("Removing",todoTitle,"from",projectTitle);
         if(project.getTitle() == projectTitle)
         {
             project.removeItem(todoTitle);
@@ -93,7 +138,6 @@ function deleteItem(item)
     if(item.classList.contains("projectItem"))  
         deleteFromProject(item);
     del(item);
-    console.log(list_of_projects);
     
 }
 function deleteButton(item)

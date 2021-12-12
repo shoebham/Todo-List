@@ -1,19 +1,20 @@
 import todo from "./todo";
 export default class project
 {
-    list_of_todo = [];
+    list_of_todo = new Set();
     constructor(project_name)
     {
         this.project_name = project_name;
     }
     addItem(todolist)
     {
-        this.list_of_todo.push(todolist);
+        this.list_of_todo.add(todolist);
     }
     removeItem(todolist)
     {
         console.log("Before removing",this.list_of_todo);
-        this.list_of_todo.splice(this.list_of_todo.indexOf(todolist),1);
+        // this.list_of_todo.splice(this.list_of_todo.indexOf(todolist),1);
+        this.list_of_todo.delete(todolist);
         console.log("After removing",this.list_of_todo);
     }
     getItem(todolist)

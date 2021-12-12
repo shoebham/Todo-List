@@ -38,7 +38,6 @@ function createItem(item)
     span.textContent = item.getTitle();
 
     input.addEventListener("change",()=>{
-        console.log("here");
         span.classList.toggle("completed");
     });
     label.appendChild(input);
@@ -58,11 +57,13 @@ function editButton(item)
         console.log("Editing",item.childNodes[0].textContent);
         let input = document.createElement("input");
         input.type = "text";
-        input.value = item.childNodes[0].textContent;
+        let oldTitle=item.childNodes[0].textContent;
+        input.value = oldTitle;
         item.replaceChild(input,item.childNodes[0]);
         let doneButton = document.createElement("button");
         doneButton.textContent = "✔️";  
         doneButton.className = "done";
+
         doneButton.addEventListener("click",()=>
         {
             let editedTask = input.value;
@@ -73,19 +74,35 @@ function editButton(item)
             label.appendChild(document.createTextNode(editedTask));
             item.replaceChild(label,input);
             item.replaceChild(button,doneButton);
+            
+            editTask(oldTitle,editedTask);
         });
         item.replaceChild(doneButton,button);
     });
     return button;
 }
 
-function editTask(item)
+function editTask(oldTitle,taskTitle)
 {
+    list_of_projects.forEach((project)=>
+    {   
+        project.getList().forEach((task)=>
+        {
+            if(task.getTitle() == oldTitle)
+            {
+                task.setTitle(taskTitle);
+                console.log("Edited",taskTitle,"in",project.getTitle());
+                console.log("after editing",list_of_projects);
+
+            }     
+        });
+    });
     list_of_tasks.forEach((task)=>
     {
-        if(task.getTitle()==item)
+        
+        if(task.getTitle()==oldTitle)
         {
-            task.setTitle(item);
+            task.setTitle(taskTitle);
         }
     });
 }
@@ -97,13 +114,15 @@ function setup()
     list_of_projects.add(p);
     let t = new todo("Todo",1,2,3);
     let t2 = new todo("Todo3",1,2,3);
-    let test = createItem(new todo("Todo2",1,2,3));
     p.addItem(t);
     p.addItem(t2);
     let ul = createProject(p);
+    let test_todo = new todo("Todo2",1,2,3)
+    let test = createItem(test_todo);
+    list_of_tasks.add(test_todo);
     div.appendChild(ul);
     div.appendChild(test);
-    console.log(list_of_projects);
+    console.log("in setup list of projects" ,list_of_projects);
     // let add_button = addButton();
     div.appendChild(addButton());
     return div;
@@ -129,7 +148,6 @@ function deleteFromProject(item)
         if(project.getTitle() == projectTitle)
         {
             project.removeItem(todoTitle);
-            console.log(project);
         }
     });
 }
@@ -179,8 +197,9 @@ function addNewTask()
     button.addEventListener("click",()=>
     {
         let new_task = input.value;
-        let new_todo = createItem(new todo(new_task));
-        list_of_tasks.push(new_todo);
+        let new_task_obj = new todo(new_task,1,2,3);
+        list_of_tasks.add(new_task_obj);
+        let new_todo = createItem(new_task_obj);
         updateView(new_todo);
     });
     div.appendChild(input);
@@ -198,7 +217,7 @@ function updateView(new_todo)
 function main()
 {
     let div = document.getElementById("content");
-    console.log(document.getElementById("content"));
+    // console.log(document.getElementById("content"));
     div.appendChild(setup());
 }
 export default main;

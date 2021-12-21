@@ -1,7 +1,9 @@
 import project from "./project";
 import todo from "./todo";
 
+// list of all projects
 let list_of_projects = new Set();
+// list of individual tasks
 let list_of_tasks = new Set();
 let list_of_completed_tasks = [];
 function createTododiv()
@@ -13,6 +15,7 @@ function createTododiv()
 function createProject(Project)
 {
     let ul = document.createElement("ul");
+    ul.id=Project.getTitle();
     ul.textContent = Project.getTitle();
     ul.appendChild(deleteButton(ul));
     let list = Project.getList();
@@ -205,14 +208,20 @@ function addNewTask()
     {
         let new_task = input.value;
         let new_task_obj = new todo(new_task,1,2,3);
-        if(projectList.value == "--")
-            list_of_tasks.add(new_task_obj);
-        else
-            getProject(projectList.value).addItem(new_task_obj);
         let new_todo = createItem(new_task_obj);
         
+        if(projectList.value == "--")
+        {
+            list_of_tasks.add(new_task_obj);
+            updateView(new_todo);
+        }
+        else
+        {
+            let project = getProject(projectList.value);
+            project.addItem(new_task_obj);
+            updateProjectTodo(new_todo,project.getTitle());
+        }
         console.log("project List after adding ",list_of_projects);
-        updateView(new_todo);
     });
     div.appendChild(input);
     div.appendChild(projectList);
@@ -250,6 +259,12 @@ function main()
     div.appendChild(setup());
 }
 
+function updateProjectTodo(new_todo,projecTitle)
+{
+    document.querySelector(".inputDiv").remove();
+    document.querySelector(".todo").appendChild(addButton());
+    document.getElementById(projecTitle).appendChild(new_todo);
+}
 function getProject(projectTitle)
 {
     let projectToReturn;

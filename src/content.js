@@ -87,27 +87,21 @@ function editButton(item)
 
 function editTask(oldTitle,taskTitle)
 {
+    let taskToEdit;
     list_of_projects.forEach((project)=>
     {   
-        project.getList().forEach((task)=>
+        taskToEdit=getTask(oldTitle,project.getList());
+        if(taskToEdit!=null)
         {
-            if(task.getTitle() == oldTitle)
-            {
-                task.setTitle(taskTitle);
-                console.log("Edited",taskTitle,"in",project.getTitle());
-                console.log("after editing",list_of_projects);
-
-            }     
-        });
-    });
-    list_of_tasks.forEach((task)=>
-    {
-        
-        if(task.getTitle()==oldTitle)
-        {
-            task.setTitle(taskTitle);
+            taskToEdit.setTitle(taskTitle);
         }
+        console.log("List of project tasks after editing",list_of_projects);
     });
+    if(taskToEdit==null)
+    {
+        getTask(oldTitle,list_of_tasks).setTitle(taskTitle);
+        console.log("List of individual tasks after editing",list_of_tasks);
+    }
 }
 function setup()
 {
@@ -133,26 +127,22 @@ function setup()
 
 function del(item)
 {
-    console.log("deleting",item.childNodes[0].textContent);
+    let taskToDelete=item.childNodes[0].textContent;
+    console.log("deleting",taskToDelete);
     item.remove();
-    console.log( "List of tasks after deleting", list_of_tasks);
+    console.log( "List of individual tasks before deleting",list_of_tasks );
+
+    list_of_tasks.delete(getTask(taskToDelete,list_of_tasks))
+    console.log( "List of individual tasks after deleting", list_of_tasks);
 }
 function deleteFromProject(item)
 {
     
     let todoTitle = item.childNodes[0].textContent;
     let projectTitle = item.classList[1];
+    let project = getProject(projectTitle);
+    project.removeItem(getTask(todoTitle,project.getList()));
     
-    // console.log(item.childNodes[0]);
-    // document.getElementsByClassName("projectItem")[0].childNodes[0].textContent
-    list_of_projects.forEach((project)=>
-    {
-        console.log("Removing",todoTitle,"from",projectTitle);
-        if(project.getTitle() == projectTitle)
-        {
-            project.removeItem(todoTitle);
-        }
-    });
 }
 function deleteItem(item)
 {
@@ -272,9 +262,22 @@ function getProject(projectTitle)
         if(project.getTitle()==projectTitle)
         {
             // today i learned return does not stop the loop from iterating -_-
-            projectToReturn= project;
+            projectToReturn=project;
         }
     });
     return projectToReturn;
+}
+
+function getTask(taskTitle,list_of_todo_of_projects)
+{
+    let taskToReturn;
+    list_of_todo_of_projects.forEach((task)=>{
+        if(task.getTitle()==taskTitle)
+        {
+            // today i learned return does not stop the loop from iterating -_-
+            taskToReturn=task;
+        }
+    });
+    return taskToReturn;
 }
 export default main;

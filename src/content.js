@@ -108,7 +108,7 @@ function editTask(oldTitle,taskTitle)
 }
 function setup()
 {
-    console.log("in setup");
+    // console.log("in setup");
     let div = createTododiv();
     let p = new project("Project");
     list_of_projects.add(p);
@@ -187,26 +187,55 @@ function addNewTask()
 {
     let div = document.createElement("div");
     div.className = "inputDiv";
+
     let input = document.createElement("input");
     input.className = "inputTask";
     input.type = "text";
     input.placeholder = "Enter new task";
+
     let button = document.createElement("button");
     button.textContent = "Add";
     button.className = "inputButton";
+
+    
+    let projectList = projectListDropdown();
+    console.log("project List before adding ",list_of_projects);
+    console.log(projectList.value)
     button.addEventListener("click",()=>
     {
         let new_task = input.value;
         let new_task_obj = new todo(new_task,1,2,3);
-        list_of_tasks.add(new_task_obj);
+        if(projectList.value == "--")
+            list_of_tasks.add(new_task_obj);
+        else
+            getProject(projectList.value).addItem(new_task_obj);
         let new_todo = createItem(new_task_obj);
+        
+        console.log("project List after adding ",list_of_projects);
         updateView(new_todo);
     });
     div.appendChild(input);
+    div.appendChild(projectList);
     div.appendChild(button);
     return div;
 }
+function projectListDropdown()
+{
+    let dropdown = document.createElement("select");
+    dropdown.className = "projectDropdown";
 
+    // add a blank option
+    let blankOption = document.createElement("option");
+    blankOption.textContent = "--";
+    dropdown.appendChild(blankOption);
+    list_of_projects.forEach((project)=>
+    {
+        let option = document.createElement("option");
+        option.textContent = project.getTitle();
+        dropdown.appendChild(option);
+    });
+    return dropdown;
+}
 function updateView(new_todo)
 {
     document.querySelector(".inputDiv").remove();
@@ -219,5 +248,18 @@ function main()
     let div = document.getElementById("content");
     // console.log(document.getElementById("content"));
     div.appendChild(setup());
+}
+
+function getProject(projectTitle)
+{
+    let projectToReturn;
+    list_of_projects.forEach((project)=>{
+        if(project.getTitle()==projectTitle)
+        {
+            // today i learned return does not stop the loop from iterating -_-
+            projectToReturn= project;
+        }
+    });
+    return projectToReturn;
 }
 export default main;

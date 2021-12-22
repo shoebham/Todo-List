@@ -1,7 +1,7 @@
 import main from "./content";
 import project from "./project";
 import todo from "./todo";
-
+import styleIt from "./style"
 function init()
 {
     console.log("here");
@@ -11,4 +11,5 @@ function init()
     p.add_item(new todo("Todo-List2"));
     console.log(p);
 }
-main();
+styleIt();
+// main();

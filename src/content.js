@@ -1,10 +1,11 @@
+
 import project from "./project";
 import todo from "./todo";
 
 // list of all projects
-let list_of_projects = new Set();
+export let list_of_projects = new Set();
 // list of individual tasks
-let list_of_tasks = new Set();
+export let list_of_tasks = new Set();
 let list_of_completed_tasks = [];
 function createTododiv()
 {
@@ -12,8 +13,9 @@ function createTododiv()
     todo_div.className = "todo";
     return todo_div;
 }
-function createProject(Project)
+export function createProject(projectName)
 {
+    let Project = getProject(projectName);
     let ul = document.createElement("ul");
     ul.id=Project.getTitle();
     ul.textContent = Project.getTitle();
@@ -103,24 +105,37 @@ function editTask(oldTitle,taskTitle)
         console.log("List of individual tasks after editing",list_of_tasks);
     }
 }
-function setup()
+export function setup(projectTitle)
 {
-    // console.log("in setup");
+    console.log("in setup",getProject(projectTitle));
     let div = createTododiv();
-    let p = new project("Project");
-    list_of_projects.add(p);
-    let t = new todo("Todo",1,2,3);
-    let t2 = new todo("Todo3",1,2,3);
-    p.addItem(t);
-    p.addItem(t2);
-    let ul = createProject(p);
-    let test_todo = new todo("Todo2",1,2,3)
-    let test = createItem(test_todo);
-    list_of_tasks.add(test_todo);
+    let ul = createProject(projectTitle);
+    // getProject(projectTitle).getList().forEach(taskItem=>
+    //     {
+    //         console.log("todo items",taskItem)
+    //         let li = createItem(taskItem);
+    //         ul.appendChild(li);
+        // });
     div.appendChild(ul);
-    div.appendChild(test);
-    console.log("in setup list of projects" ,list_of_projects);
+    
+        // let p = new project("Project");
+    // list_of_projects.add(p);
+    // let t = new todo("Todo",1,2,3);
+    // let t2 = new todo("Todo3",1,2,3);
+    // p.addItem(t);
+    // p.addItem(t2);
+    // let ul = createProject(p);
+    // let test_todo = new todo("Todo2",1,2,3)
+    // let test = createItem(test_todo);
+    // list_of_tasks.add(test_todo);
+    // div.appendChild(ul);
+    // div.appendChild(test);
+    // console.log("in setup list of projects" ,list_of_projects);
     // let add_button = addButton();
+    // let p = new project(projectTitle);
+    // list_of_projects.add(p);
+    // div.appendChild(createProject(p));
+    
     div.appendChild(addButton());
     return div;
 }
@@ -136,19 +151,28 @@ function del(item)
     console.log( "List of individual tasks after deleting", list_of_tasks);
 }
 function deleteFromProject(item)
-{
-    
+{    
     let todoTitle = item.childNodes[0].textContent;
     let projectTitle = item.classList[1];
     let project = getProject(projectTitle);
     project.removeItem(getTask(todoTitle,project.getList()));
-    
+}
+
+function deleteProject(item)
+{
+    let projectTitle = item.childNodes[0].textContent;
+    let project = getProject(projectTitle);
+    list_of_projects.delete(project);
+    item.remove();
+    document.getElementById(projectTitle+"-Button").remove();
+    document.getElementsByClassName("add")[0].remove();
 }
 function deleteItem(item)
 {
     if(item.classList.contains("projectItem"))  
         deleteFromProject(item);
-    del(item);
+    else
+        deleteProject(item);
     
 }
 function deleteButton(item)
@@ -190,25 +214,34 @@ function addNewTask()
     button.textContent = "Add";
     button.className = "inputButton";
 
-    
     let projectList = projectListDropdown();
+    
+    let projectValue = projectList.value;
+    projectList.addEventListener("change",()=>
+    {
+        projectValue = projectList.value;
+        console.log(projectValue);
+    });
     console.log("project List before adding ",list_of_projects);
-    console.log(projectList.value)
+    console.log(projectValue)
     button.addEventListener("click",()=>
     {
         let new_task = input.value;
         let new_task_obj = new todo(new_task,1,2,3);
         let new_todo = createItem(new_task_obj);
         
-        if(projectList.value == "--")
+        if(projectValue == "--")
         {
             list_of_tasks.add(new_task_obj);
             updateView(new_todo);
         }
         else
         {
-            let project = getProject(projectList.value);
+            console.log("in else ",list_of_projects);
+            let project = getProject(projectValue);
+            console.log("216",list_of_projects);
             project.addItem(new_task_obj);
+            console.log("217",list_of_projects);    
             updateProjectTodo(new_todo,project.getTitle());
         }
         console.log("project List after adding ",list_of_projects);
@@ -233,26 +266,30 @@ function projectListDropdown()
         option.textContent = project.getTitle();
         dropdown.appendChild(option);
     });
+    // select project by default
+    dropdown.value = document.querySelector(".todo").childNodes[0].id;
+
     return dropdown;
 }
 function updateView(new_todo)
 {
     document.querySelector(".inputDiv").remove();
     let div = document.querySelector(".todo");
-    div.appendChild(new_todo);
+    // div.appendChild(new_todo);
     div.appendChild(addButton());
 }
-function main()
+function main(projectTitle)
 {
     let div = document.getElementById("content");
     // console.log(document.getElementById("content"));
-    div.appendChild(setup());
+   div.appendChild(setup(projectTitle));
 }
 
 function updateProjectTodo(new_todo,projecTitle)
 {
     document.querySelector(".inputDiv").remove();
     document.querySelector(".todo").appendChild(addButton());
+    console.log("error is here",new_todo,projecTitle);
     document.getElementById(projecTitle).appendChild(new_todo);
 }
 function getProject(projectTitle)

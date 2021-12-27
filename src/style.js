@@ -1,5 +1,5 @@
 
-import main, { list_of_projects } from "./content";
+import main, { getProject, list_of_projects } from "./content";
 import project from "./project";
 import createProject from "./content";
 import { setup } from "./content";
@@ -15,8 +15,8 @@ function sideBar()
 {
     let div = document.createElement("div");
     div.id="side-bar";
-    div.innerHTML = "<h2>Side Nav</h2>";
-    div.appendChild(fillSideNav());
+    div.innerHTML = "<center><h2>Projects</h2></center>";
+    // div.appendChild(fillSideNav());
     div.appendChild(addProject());
     return div;
 }
@@ -34,6 +34,7 @@ function addProject()
 {
     let addNewProject = document.createElement("button");
     addNewProject.textContent="Add Project";
+    addNewProject.classList.add("add");
     addNewProject.id="addProject";
     addNewProject.addEventListener("click",()=>
     {
@@ -53,15 +54,27 @@ function addNewProjectInput()
 
     let button = document.createElement("button");
     button.textContent = "Add";
-    button.className = "inputButton";
+    button.className = "add";
 
     button.addEventListener("click",()=>
     {
         let newProject = input.value;
-        newProject = new project(input.value);
-        console.log(newProject);
-        list_of_projects.add(newProject);
-        projectDisplay(newProject.getTitle());
+        if(newProject=="")
+        {
+            alert("Please enter a project name");
+        }
+        else if(list_of_projects.has(getProject(newProject)))
+        {
+            alert("Project already exists");
+        } 
+        else
+        {
+            
+            newProject = new project(input.value);
+            console.log(newProject);
+            list_of_projects.add(newProject);
+            projectDisplay(newProject.getTitle());
+        }
         // div.replaceWith(addProject());
     });
     div.appendChild(input);
@@ -74,6 +87,7 @@ function projectDisplay(projectName)
     let button = document.createElement("button");
     button.textContent=projectName;
     button.id=projectName+"-Button";
+    button.className="project-button"
     button.addEventListener("click",()=>
     {
         changeView(projectName);
@@ -101,7 +115,7 @@ function changeView(projectName)
 function styleIt()
 {
     let content = document.getElementById("content");
-    content.appendChild(header());
+    // document.querySelector("body").appendChild(header());
     content.appendChild(sideBar());
 }
 export default styleIt;

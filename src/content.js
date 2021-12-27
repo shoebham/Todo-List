@@ -18,6 +18,7 @@ export function createProject(projectName)
     let Project = getProject(projectName);
     let ul = document.createElement("ul");
     ul.id=Project.getTitle();
+    ul.className="project";
     ul.textContent = Project.getTitle();
     ul.appendChild(deleteButton(ul));
     let list = Project.getList();
@@ -55,18 +56,19 @@ function createItem(item)
 function editButton(item)
 {
     let button = document.createElement("button");
-    button.textContent = "✏️";
+    button.textContent = "EDIT";
     button.className = "edit";
     button.addEventListener("click",()=>
     {
         console.log("Editing",item.childNodes[0].textContent);
         let input = document.createElement("input");
+        
         input.type = "text";
         let oldTitle=item.childNodes[0].textContent;
         input.value = oldTitle;
         item.replaceChild(input,item.childNodes[0]);
         let doneButton = document.createElement("button");
-        doneButton.textContent = "✔️";  
+        doneButton.textContent = "Done";  
         doneButton.className = "done";
 
         doneButton.addEventListener("click",()=>
@@ -76,7 +78,13 @@ function editButton(item)
             checkbox.type = "checkbox";
             let label = document.createElement("label");
             label.appendChild(checkbox);
-            label.appendChild(document.createTextNode(editedTask));
+            let span = document.createElement("span");
+            span.textContent = editedTask;
+            checkbox.addEventListener("change",()=>{
+                span.classList.toggle("completed");
+            });
+            // span.className=
+            label.appendChild(span);
             item.replaceChild(label,input);
             item.replaceChild(button,doneButton);
             
@@ -178,7 +186,7 @@ function deleteItem(item)
 function deleteButton(item)
 {
     let button = document.createElement("button");
-    button.textContent = "⚰️";
+    button.textContent = "DELETE";
     button.className = "delete";
     button.addEventListener("click",()=>
     {
@@ -191,7 +199,7 @@ function deleteButton(item)
 function addButton()
 {
     let button = document.createElement("button");
-    button.textContent = "Add";
+    button.textContent = "Add Task";
     button.className = "add";
 
     button.addEventListener("click",()=>{
@@ -212,7 +220,7 @@ function addNewTask()
 
     let button = document.createElement("button");
     button.textContent = "Add";
-    button.className = "inputButton";
+    button.className = "add";
 
     let projectList = projectListDropdown();
     
@@ -292,7 +300,7 @@ function updateProjectTodo(new_todo,projecTitle)
     console.log("error is here",new_todo,projecTitle);
     document.getElementById(projecTitle).appendChild(new_todo);
 }
-function getProject(projectTitle)
+export function getProject(projectTitle)
 {
     let projectToReturn;
     list_of_projects.forEach((project)=>{

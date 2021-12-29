@@ -1,5 +1,5 @@
 
-import main, { getProject, list_of_projects } from "./content";
+import main, { blankScreen, getProject, list_of_projects } from "./content";
 import project from "./project";
 import createProject from "./content";
 import { setup } from "./content";
@@ -34,7 +34,7 @@ function addProject()
 {
     let addNewProject = document.createElement("button");
     addNewProject.textContent="Add Project";
-    addNewProject.classList.add("add");
+    // addNewProject.classList.add("add");
     addNewProject.id="addProject";
     addNewProject.addEventListener("click",()=>
     {
@@ -54,8 +54,15 @@ function addNewProjectInput()
 
     let button = document.createElement("button");
     button.textContent = "Add";
-    button.className = "add";
+    button.className="add";
+    let cancel = document.createElement("button");
+    cancel.textContent="cancel";
+    cancel.className="cancel";
 
+    cancel.addEventListener("click",()=>
+    {
+        div.replaceWith(addProject());
+    });
     button.addEventListener("click",()=>
     {
         let newProject = input.value;
@@ -74,11 +81,13 @@ function addNewProjectInput()
             console.log(newProject);
             list_of_projects.add(newProject);
             projectDisplay(newProject.getTitle());
+            changeView(newProject.getTitle());
         }
         // div.replaceWith(addProject());
     });
     div.appendChild(input);
     div.appendChild(button);
+    div.appendChild(cancel);
     return div;
 }
 
@@ -106,7 +115,9 @@ function showAllTasks()
 function changeView(projectName)
 {
     let todoDiv=document.querySelector(".todo");
-    console.log(todoDiv);
+    // console.log(todoDiv);
+    if(document.querySelector(".blankScreen"))
+        document.getElementById("content").removeChild(document.querySelector(".blankScreen"));
     if(todoDiv)
         document.getElementById("content").replaceChild(setup(projectName), document.querySelector(".todo"));
     else
@@ -114,8 +125,10 @@ function changeView(projectName)
 }
 function styleIt()
 {
+    // add header before content 
+    document.body.insertBefore(header(),document.getElementById("content"));
     let content = document.getElementById("content");
-    // document.querySelector("body").appendChild(header());
     content.appendChild(sideBar());
+    content.appendChild(blankScreen());
 }
 export default styleIt;

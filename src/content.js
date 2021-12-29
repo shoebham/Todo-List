@@ -18,8 +18,11 @@ export function createProject(projectName)
     let Project = getProject(projectName);
     let ul = document.createElement("ul");
     ul.id=Project.getTitle();
-    ul.className="project";
-    ul.textContent = Project.getTitle();
+    ul.className="project-ul";
+    let span = document.createElement("span");
+    span.textContent = Project.getTitle();
+    span.className = "project-span";
+    ul.appendChild(span);
     ul.appendChild(deleteButton(ul));
     let list = Project.getList();
     list.forEach((item)=>
@@ -41,6 +44,7 @@ function createItem(item)
 
     input.type = "checkbox";
     li.style="list-style-type: none";
+    li.className="projectItem";
     span.textContent = item.getTitle();
 
     input.addEventListener("change",()=>{
@@ -118,32 +122,7 @@ export function setup(projectTitle)
     console.log("in setup",getProject(projectTitle));
     let div = createTododiv();
     let ul = createProject(projectTitle);
-    // getProject(projectTitle).getList().forEach(taskItem=>
-    //     {
-    //         console.log("todo items",taskItem)
-    //         let li = createItem(taskItem);
-    //         ul.appendChild(li);
-        // });
-    div.appendChild(ul);
-    
-        // let p = new project("Project");
-    // list_of_projects.add(p);
-    // let t = new todo("Todo",1,2,3);
-    // let t2 = new todo("Todo3",1,2,3);
-    // p.addItem(t);
-    // p.addItem(t2);
-    // let ul = createProject(p);
-    // let test_todo = new todo("Todo2",1,2,3)
-    // let test = createItem(test_todo);
-    // list_of_tasks.add(test_todo);
-    // div.appendChild(ul);
-    // div.appendChild(test);
-    // console.log("in setup list of projects" ,list_of_projects);
-    // let add_button = addButton();
-    // let p = new project(projectTitle);
-    // list_of_projects.add(p);
-    // div.appendChild(createProject(p));
-    
+    div.appendChild(ul);   
     div.appendChild(addButton());
     return div;
 }
@@ -160,20 +139,27 @@ function del(item)
 }
 function deleteFromProject(item)
 {    
+    console.log(item);
     let todoTitle = item.childNodes[0].textContent;
     let projectTitle = item.classList[1];
     let project = getProject(projectTitle);
+    console.log("deleting from project",todoTitle,projectTitle);
     project.removeItem(getTask(todoTitle,project.getList()));
+    item.remove();
 }
 
 function deleteProject(item)
 {
+    
+    console.log(item.childNodes[0].textContent);
     let projectTitle = item.childNodes[0].textContent;
     let project = getProject(projectTitle);
     list_of_projects.delete(project);
     item.remove();
     document.getElementById(projectTitle+"-Button").remove();
     document.getElementsByClassName("add")[0].remove();
+    if(project.getList().size==0)
+        document.querySelector(".todo").replaceWith(blankScreen());
 }
 function deleteItem(item)
 {
@@ -222,6 +208,14 @@ function addNewTask()
     button.textContent = "Add";
     button.className = "add";
 
+    let cancel = document.createElement("button");
+    cancel.textContent="cancel";
+    cancel.className = "cancel";
+
+    cancel.addEventListener("click",()=>
+    {
+        div.replaceWith(addButton());
+    })
     let projectList = projectListDropdown();
     
     let projectValue = projectList.value;
@@ -235,28 +229,41 @@ function addNewTask()
     button.addEventListener("click",()=>
     {
         let new_task = input.value;
-        let new_task_obj = new todo(new_task,1,2,3);
-        let new_todo = createItem(new_task_obj);
-        
-        if(projectValue == "--")
+        if(getTask(new_task,getProject(projectValue).getList())==null&&new_task!="")
         {
-            list_of_tasks.add(new_task_obj);
-            updateView(new_todo);
+            let new_task_obj = new todo(new_task,1,2,3);
+            let new_todo = createItem(new_task_obj);
+            
+            if(projectValue == "--")
+            {
+                list_of_tasks.add(new_task_obj);
+                updateView(new_todo);
+            }
+            else
+            {
+                console.log("in else ",list_of_projects);
+                let project = getProject(projectValue);
+                console.log("216",list_of_projects);
+                project.addItem(new_task_obj);
+                console.log("217",list_of_projects);    
+                updateProjectTodo(new_todo,project.getTitle());
+            }
+            console.log("project List after adding ",list_of_projects);
+        }
+        else if(new_task=="")
+        {
+            alert("Task cannot be empty");
         }
         else
         {
-            console.log("in else ",list_of_projects);
-            let project = getProject(projectValue);
-            console.log("216",list_of_projects);
-            project.addItem(new_task_obj);
-            console.log("217",list_of_projects);    
-            updateProjectTodo(new_todo,project.getTitle());
+            alert("Task already exists");
         }
-        console.log("project List after adding ",list_of_projects);
-    });
+        });
+        
     div.appendChild(input);
     div.appendChild(projectList);
     div.appendChild(button);
+    div.appendChild(cancel);
     return div;
 }
 function projectListDropdown()
@@ -293,12 +300,22 @@ function main(projectTitle)
    div.appendChild(setup(projectTitle));
 }
 
-function updateProjectTodo(new_todo,projecTitle)
+function updateProjectTodo(new_todo,projectTitle)
 {
     document.querySelector(".inputDiv").remove();
     document.querySelector(".todo").appendChild(addButton());
-    console.log("error is here",new_todo,projecTitle);
-    document.getElementById(projecTitle).appendChild(new_todo);
+    // console.log("error is here",new_todo,projecTitle);
+    document.getElementById(projectTitle).appendChild(new_todo);
+    document.querySelectorAll(".projectItem").forEach((item)=>item.classList.add(projectTitle));
+}
+
+export function blankScreen()
+{
+    let div = document.createElement("div");
+    div.innerHTML = "<h4>It's empty here!!<br>Create a new project and add tasks in it</h4>";
+    div.className="blankScreen";
+    return div;
+
 }
 export function getProject(projectTitle)
 {
